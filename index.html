@@ -59,6 +59,19 @@
         margin: 0;
         padding: 0;
       }
+      #legend {
+        font-family: Arial, sans-serif;
+        background: #fff;
+        padding: 10px;
+        margin: 10px;
+        border: 3px solid #000;
+      }
+      #legend h3 {
+        margin-top: 0;
+      }
+      #legend img {
+        vertical-align: middle;
+      }
     </style>
 </head>
 <body>
@@ -66,54 +79,84 @@
     <button class="botao btn btn-primary" onclick="novoMarcador()">Adicionar Hidrante onde estou!</button>
   </div>
   <div id="map"></div>
-
+  <div id="legend"><h3>Legenda</h3></div>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_3Phoe6_5JgScHGb7ExNiYYrIiEE9MbI&callback=getLocation"
     async defer></script>
   <!-- CODELAB: Add the install script here -->
   <script>
-      //getLocation();
-      var deviceLatitude = -20.3129238;
-      var deviceLongitude = -40.2912268;
-      var deviceLocalization = null; 
-      var map = null;
-      function getLocation(){
-        if (navigator.geolocation){
-          navigator.geolocation.getCurrentPosition(showPosition);
+    //getLocation();
+    var deviceLatitude = -20.3129238;
+    var deviceLongitude = -40.2912268;
+    var deviceLocalization = null; 
+    var map = null;
+    function getLocation(){
+      if (navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(showPosition);
+      }
+      else {console.log('Navegador não suporta navegação')}
+    }
+    function showPosition(position){
+      deviceLatitude = position.coords.latitude;
+      deviceLongitude = position.coords.longitude;
+      console.log('Latitude: ' + deviceLatitude + ' Longitude: ' + deviceLongitude);
+      initMap();
+    }
+    
+
+
+    function initMap() {
+      // The location of Uluru
+      deviceLocalization = {lat: deviceLatitude, lng: deviceLongitude};
+      // The map, centered at Uluru
+      map = new google.maps.Map(
+        document.getElementById('map'), {zoom: 20, center: deviceLocalization});
+
+      var icons = {
+        hidrante: {
+          name: 'Hidrante',
+          icon: '../images/icons/icon-32x32.png'
         }
-        else {console.log('Navegador não suporta navegação')}
-      }
-      function showPosition(position){
-        deviceLatitude = position.coords.latitude;
-        deviceLongitude = position.coords.longitude;
-        console.log('Latitude: ' + deviceLatitude + ' Longitude: ' + deviceLongitude);
-        initMap();
-      }
+      };
+
+      var features = [
+        {
+          position: new google.maps.LatLng(-20.370599, -40.306822),
+          type: 'hidrante'
+        }, {
+          position: new google.maps.LatLng(-20.3712331,-40.3061732),
+          type: 'hidrante'
+        }
+      ];
+
+      // Create markers.
+      features.forEach(function(feature) {
+        var marker = new google.maps.Marker({
+          position: feature.position,
+          //icon: '../images/icons/icon-32x32.png',
+          icon: icons[feature.type].icon,
+          map: map
+        });
+      });
       
-  
-  
-      function initMap() {
-        // The location of Uluru
-        deviceLocalization = {lat: deviceLatitude, lng: deviceLongitude};
-        // The map, centered at Uluru
-        map = new google.maps.Map(
-          document.getElementById('map'), {zoom: 20, center: deviceLocalization});
-        // The marker, positioned at Uluru
-        carregarMarcadores();
+
+      var legend = document.getElementById('legend');
+      for (var key in icons) {
+        var type = icons[key];
+        var name = type.name;
+        var icon = type.icon;
+        var div = document.createElement('div');
+        div.innerHTML = '<img src="' + icon + '"> ' + name;
+        legend.appendChild(div);
+        
       }
-  
-      function carregarMarcadores(){
-        var etapa7 = {lat: -20.370599, lng: -40.306822};
-        var pastel = {lat: -20.3712331, lng: -40.3061732};
-        var marker = new google.maps.Marker({position: etapa7, map: map});
-        var marker = new google.maps.Marker({position: pastel, map: map});  
-      }
-  
-      function novoMarcador(){
-        var marker = new google.maps.Marker({position: deviceLocalization, map: map});
-      }
-      
-          
-    </script>
+      map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(legend);
+    }
+
+    function novoMarcador(){
+      var marker = new google.maps.Marker({position: deviceLocalization, icon: '../images/icons/icon-32x32.png', map: map});
+    }
+            
+  </script>
   <script>
     // CODELAB: Register service worker.
     if ('serviceWorker' in navigator) {
@@ -125,8 +168,5 @@
       });
     }
   </script>
-  
-  
-  
 </body>
 </html>
