@@ -1,0 +1,132 @@
+<!--
+ Your First PWA Codelab (https://g.co/codelabs/pwa)
+
+ Copyright 2019 Google Inc.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mapa de Hidrantes PWA</title>
+  <meta name="Mapa de Hidrantes" content="Mapa-de-Hidrantes">
+  <link rel="icon" href="/images/favicon.ico" type="image/x-icon" />
+
+  <!-- CODELAB: Add link rel manifest -->
+  <link rel="manifest" href="/manifest.json">
+  <!-- CODELAB: Add iOS meta tags and icons -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Mapa de Hidrantes PWA">
+  <link rel="apple-touch-icon" href="/images/icons/icon-152x152.png">
+  <!-- CODELAB: Add description here -->
+  <meta name="description" content="Mapa de Hidrantes">
+  <!-- CODELAB: Add meta theme-color -->
+  <meta name="theme-color" content="#2F3BA2" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <style>
+      /* Always set the map height explicitly to define the size of the div
+        * element that contains the map. */
+      #map {
+        height: 95%;
+      }
+      .botao {
+        padding: .1rem .75rem;
+        height: 100%;
+        width: 100%;
+      }
+      .divBotoes {
+        width: 100%;
+        height: 05%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+</head>
+<body>
+  <div class="divBotoes">
+    <button class="botao btn btn-primary" onclick="novoMarcador()">Adicionar Hidrante onde estou!</button>
+  </div>
+  <div id="map"></div>
+
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_3Phoe6_5JgScHGb7ExNiYYrIiEE9MbI&callback=getLocation"
+    async defer></script>
+  <!-- CODELAB: Add the install script here -->
+  <script>
+      //getLocation();
+      var deviceLatitude = -20.3129238;
+      var deviceLongitude = -40.2912268;
+      var deviceLocalization = null; 
+      var map = null;
+      function getLocation(){
+        if (navigator.geolocation){
+          navigator.geolocation.getCurrentPosition(showPosition);
+        }
+        else {console.log('Navegador não suporta navegação')}
+      }
+      function showPosition(position){
+        deviceLatitude = position.coords.latitude;
+        deviceLongitude = position.coords.longitude;
+        console.log('Latitude: ' + deviceLatitude + ' Longitude: ' + deviceLongitude);
+        initMap();
+      }
+      
+  
+  
+      function initMap() {
+        // The location of Uluru
+        deviceLocalization = {lat: deviceLatitude, lng: deviceLongitude};
+        // The map, centered at Uluru
+        map = new google.maps.Map(
+          document.getElementById('map'), {zoom: 20, center: deviceLocalization});
+        // The marker, positioned at Uluru
+        carregarMarcadores();
+      }
+  
+      function carregarMarcadores(){
+        var etapa7 = {lat: -20.370599, lng: -40.306822};
+        var pastel = {lat: -20.3712331, lng: -40.3061732};
+        var marker = new google.maps.Marker({position: etapa7, map: map});
+        var marker = new google.maps.Marker({position: pastel, map: map});  
+      }
+  
+      function novoMarcador(){
+        var marker = new google.maps.Marker({position: deviceLocalization, map: map});
+      }
+      
+          
+    </script>
+  <script>
+    // CODELAB: Register service worker.
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then((reg) => {
+          console.log('Service worker registered.', reg);
+        });
+      });
+    }
+  </script>
+  
+  
+  
+</body>
+</html>
